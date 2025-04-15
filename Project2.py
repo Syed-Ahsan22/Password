@@ -1,71 +1,76 @@
 import re
 import streamlit as st
 
-#page styling 
+# Page styling
 st.set_page_config(page_title="Password Strength Checker By Syed Developer", page_icon="🌘", layout="centered")
 
-#Css
+# Custom CSS
 st.markdown(""" 
 <style> 
-            .main {text-align: center;}
-            .stTextInput {width: 60% !important; margin: auto;}
-            .stButton button {width: 50%; background-color #4CAF50; color: white; font-size: 18px:}
-            .stButton button:hover { background-color: #45a049;}
-            </style>
-            """, unsafe_allow_html=True)
+    .main {text-align: center;}
+    .stTextInput > div > div > input {
+        width: 60% !important;
+        margin: auto;
+    }
+    .stButton > button {
+        width: 50%;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 18px;
+    }
+    .stButton > button:hover {
+        background-color: #45a049;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-#page title
+# Page title and subtitle
+st.title("🔐 Password Strength Checker")
+st.write("Enter your password below to check its security level. 🔍")
 
-st.title("🔐 Password Strength Generator")
-st.write(" Enter Your Password Below to Check its Security Level. 🔍")
-
-#check password strenght
-
-import re
-
+# Password strength checker function
 def check_password_strength(password):
     score = 0
-    
-    # Length Check
+    feedback = []
+
     if len(password) >= 8:
         score += 1
     else:
-        print("❌ Password should be at least 8 characters long.")
-    
-    # Upper & Lowercase Check
+        feedback.append("❌ Password should be at least 8 characters long.")
+
     if re.search(r"[A-Z]", password) and re.search(r"[a-z]", password):
         score += 1
     else:
-        print("❌ Include both uppercase and lowercase letters.")
-    
-    # Digit Check
+        feedback.append("❌ Include both uppercase and lowercase letters.")
+
     if re.search(r"\d", password):
         score += 1
     else:
-        print("❌ Add at least one number (0-9).")
-    
-    # Special Character Check
+        feedback.append("❌ Add at least one number (0-9).")
+
     if re.search(r"[!@#$%^&*]", password):
         score += 1
     else:
-        print("❌ Include at least one special character (!@#$%^&*).")
-    
-    # Strength Rating
-    if score == 4:
-        print("✅ Strong Password!")
-    elif score == 3:
-        print("⚠️ Moderate Password - Consider adding more security features.")
-    else:
-        print("❌ Weak Password - Improve it using the suggestions above.")
+        feedback.append("❌ Include at least one special character (!@#$%^&*).")
 
-# Get user input
-password = input("Enter your password: ")
-check_password_strength(password)
+    return score, feedback
 
-#Buttom working
+# User input
+password = st.text_input("🔑 Enter Password", type="password")
 
+# Check button
 if st.button("Check Strength"):
     if password:
-          check_password_strength(password)
-    else :
-            st.warning("⚠️ Please Enter the Password!")
+        score, feedback = check_password_strength(password)
+
+        if score == 4:
+            st.success("✅ Strong Password!")
+        elif score == 3:
+            st.warning("⚠️ Moderate Password - Consider adding more security features.")
+        else:
+            st.error("❌ Weak Password - Improve it using the suggestions below.")
+        
+        for item in feedback:
+            st.info(item)
+    else:
+        st.warning("⚠️ Please enter a password!")
